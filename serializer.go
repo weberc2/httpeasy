@@ -22,7 +22,7 @@ import (
 //
 // OR:
 //
-//     return Ok(JSON(Person{Name: "Bob", Age: "58"}))
+//     return Ok(JSON(Person{Name: "Bob", Age: 58}))
 //
 type Serializer func() (io.WriterTo, error)
 
