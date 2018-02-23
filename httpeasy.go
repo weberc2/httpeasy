@@ -80,8 +80,8 @@ type Request struct {
 // Handler handles HTTP requests
 type Handler func(r Request) Response
 
-// LogFunc logs its arguments
-type LogFunc func(vs ...interface{})
+// LogFunc logs its argument
+type LogFunc func(v interface{})
 
 // HTTP converts an httpeasy.Handler into an http.HandlerFunc. The returned
 // function will collect a bunch of standard HTTP information and pass it to
