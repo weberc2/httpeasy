@@ -28,6 +28,13 @@ func main() {
 				}{Greeting: "Hello, world!"}))
 			},
 		},
+		Route{
+			Path:   "/error",
+			Method: "GET",
+			Handler: func(r Request) Response {
+				return InternalServerError("Error details...")
+			},
+		},
 	)); err != nil {
 		log.Fatal(err)
 	}

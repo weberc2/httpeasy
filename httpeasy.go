@@ -32,6 +32,13 @@
 //                     }{Greeting: "Hello, world!"}))
 //                 },
 //             },
+//             Route{
+//                 Path:   "/error",
+//                 Method: "GET",
+//                 Handler: func(r Request) Response {
+//                     return InternalServerError("Error details...")
+//                 },
+//             },
 //         )); err != nil {
 //             log.Fatal(err)
 //         }
@@ -92,7 +99,7 @@ func NotFound(data Serializer, logging ...interface{}) Response {
 	return Response{Status: http.StatusNotFound, Data: data, Logging: logging}
 }
 
-// Log represents a standard HTTP request log
+// RequestLog represents a standard HTTP request log
 type RequestLog struct {
 	// Started holds the start time for the request
 	Started time.Time `json:"started"`
