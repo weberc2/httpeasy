@@ -78,7 +78,7 @@ func HTMLTemplate(t *html.Template, v interface{}) Serializer {
 	}
 }
 
-// TextTemplate takes an html/template.Template and some data and returns a
+// TextTemplate takes a text/template.Template and some data and returns a
 // serializer. The serializer will execute the template with the data and
 // return any errors it encounters. See the HTMLTemplate() example in
 // examples/hello.go for an analogous example.
