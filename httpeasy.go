@@ -62,8 +62,29 @@ import (
 // Request represents a simplified HTTP request
 type Request struct {
 	Vars    map[string]string
-	Body    []byte
+	Body    io.Reader
 	Headers http.Header
+}
+
+// Text reads `r.Body` and returns the result as a string.
+func (r Request) Text() (string, error) {
+	data, err := r.Bytes()
+	return string(data), err
+}
+
+// Bytes reads `r.Body` and returns the result as a slice of bytes.
+func (r Request) Bytes() ([]byte, error) {
+	return ioutil.ReadAll(r.Body)
+}
+
+// JSON deserializes `r.Body` into `v`. `v` must be a pointer; all the standard
+// `encoding/json.Unmarshal()` rules apply.
+func (r Request) JSON(v interface{}) error {
+	data, err := r.Bytes()
+	if err != nil {
+		return err
+	}
+	return json.Unmarshal(data, v)
 }
 
 // Response represents a simplifiied HTTP response
@@ -97,6 +118,16 @@ func InternalServerError(logging ...interface{}) Response {
 // responses.
 func NotFound(data Serializer, logging ...interface{}) Response {
 	return Response{Status: http.StatusNotFound, Data: data, Logging: logging}
+}
+
+// BadRequest is a convenience function for building HTTP 400 Bad Request
+// responses.
+func BadRequest(logging ...interface{}) Response {
+	return Response{
+		Status:  http.StatusBadRequest,
+		Data:    String("400 Bad Request"),
+		Logging: logging,
+	}
 }
 
 // RequestLog represents a standard HTTP request log
@@ -164,17 +195,7 @@ func (h Handler) HTTP(log LogFunc) http.HandlerFunc {
 		start := time.Now()
 		defer r.Body.Close()
 
-		var rsp Response
-
-		data, err := ioutil.ReadAll(r.Body)
-		if err != nil {
-			rsp = InternalServerError(struct {
-				Context string `json:"context"`
-				Error   string `json:"error"`
-			}{Context: "Failed to read request body", Error: err.Error()})
-		} else {
-			rsp = h(Request{Vars: mux.Vars(r), Body: data, Headers: r.Header})
-		}
+		rsp := h(Request{Vars: mux.Vars(r), Body: r.Body, Headers: r.Header})
 
 		writerTo, err := rsp.Data()
 		if err != nil {
