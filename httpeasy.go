@@ -139,6 +139,16 @@ func Ok(data Serializer, logging ...interface{}) Response {
 	return Response{Status: http.StatusOK, Data: data, Logging: logging}
 }
 
+// NoContent is a convenience function for building HTTP 204 No Content
+// responses.
+func NoContent(logging ...interface{}) Response {
+	return Response{
+		Status:  http.StatusNoContent,
+		Data:    Bytes(nil),
+		Logging: logging,
+	}
+}
+
 // InternalServerError is a convenience function for building HTTP 500 Internal
 // Server Error responses.
 func InternalServerError(logging ...interface{}) Response {
@@ -184,6 +194,9 @@ type requestLog struct {
 
 	// URL holds the URL for the request
 	URL url.URL `json:"url"`
+
+	// Headers holds the headers for the request
+	Headers http.Header `json:"headers"`
 
 	// Status holds the HTTP status code returned by the request handler
 	Status int `json:"status"`
@@ -262,6 +275,7 @@ func (h Handler) HTTP(log LogFunc) http.HandlerFunc {
 			Duration:   time.Since(start),
 			Method:     r.Method,
 			URL:        *r.URL,
+			Headers:    r.Header,
 			Status:     rsp.Status,
 			Message:    rsp.Logging,
 			WriteError: err,
