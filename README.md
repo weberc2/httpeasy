@@ -8,7 +8,28 @@ bit easier to use than the standard library's `net/http` framework without
 compromising performance. It is deliberately less fully-featured than
 `net/http`.
 
-`httpeasy` provides complete request logging out of the box.
+`httpeasy` provides complete request logging out of the box as well as a suite
+of helper functions for operating on requests and responses, including a suite
+of utilities for working with requests...
+
+* `Request.Bytes()`
+* `Request.Text()`,
+* `Request.JSON()`
+* `Request.Vars`
+
+...for serializing data...
+
+* `JSON()`
+*`String()`
+* `HTMLTemplate()`
+* etc
+
+...and for creating responses...
+
+* `Ok()`
+* `InternalServerError()`
+* `NotFound()`
+* `BadRequest()`
 
 ## Installation
 
@@ -20,6 +41,7 @@ compromising performance. It is deliberately less fully-featured than
 package main
 
 import (
+	html "html/template"
 	"log"
 	"net/http"
 	"os"
@@ -32,19 +54,34 @@ func main() {
 	if err := http.ListenAndServe(":8080", Register(
 		JSONLog(os.Stderr),
 		Route{
-			Path:   "/plaintext",
+			Path:   "/plaintext/{name}",
 			Method: "GET",
 			Handler: func(r Request) Response {
-				return Ok(String("Hello, world!"))
+				return Ok(String("Hello, " + r.Vars["name"] + "!"))
 			},
 		},
 		Route{
-			Path:   "/json",
+			Path:   "/json/{name}",
 			Method: "GET",
 			Handler: func(r Request) Response {
 				return Ok(JSON(struct {
 					Greeting string `json:"greeting"`
-				}{Greeting: "Hello, world!"}))
+				}{Greeting: "Hello, " + r.Vars["name"] + "!"}))
+			},
+		},
+		Route{
+			Path:   "/html/{name}",
+			Method: "GET",
+			Handler: func(r Request) Response {
+				return Ok(HTMLTemplate(
+					html.Must(html.New("greeting.html").Parse(
+						`<html>
+							<body>
+								<h1>Hello, {{.Name}}</h1>
+							</body>
+						</html>`,
+					)),
+					struct{ Name string }{r.Vars["name"]}))
 			},
 		},
 		Route{

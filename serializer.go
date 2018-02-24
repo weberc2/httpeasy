@@ -4,8 +4,10 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	html "html/template"
 	"io"
 	"strings"
+	text "text/template"
 
 	"github.com/davecgh/go-spew/spew"
 )
@@ -64,3 +66,26 @@ func JSON(v interface{}) Serializer {
 // is github.com/davecgh/go-spew/spew.Sdump(). The returned serializer always
 // succeeds.
 func Debug(vs ...interface{}) Serializer { return String(spew.Sdump(vs...)) }
+
+// HTMLTemplate takes an html/template.Template and some data and returns a
+// serializer. The serializer will execute the template with the data and
+// return any errors it encounters. See examples/hello.go for an example.
+func HTMLTemplate(t *html.Template, v interface{}) Serializer {
+	return func() (io.WriterTo, error) {
+		var buf bytes.Buffer
+		err := t.Execute(&buf, v)
+		return &buf, err
+	}
+}
+
+// TextTemplate takes an html/template.Template and some data and returns a
+// serializer. The serializer will execute the template with the data and
+// return any errors it encounters. See the HTMLTemplate() example in
+// examples/hello.go for an analogous example.
+func TextTemplate(t *text.Template, v interface{}) Serializer {
+	return func() (io.WriterTo, error) {
+		var buf bytes.Buffer
+		err := t.Execute(&buf, v)
+		return &buf, err
+	}
+}

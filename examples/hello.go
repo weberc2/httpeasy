@@ -1,6 +1,7 @@
 package main
 
 import (
+	html "html/template"
 	"log"
 	"net/http"
 	"os"
@@ -13,19 +14,34 @@ func main() {
 	if err := http.ListenAndServe(":8080", Register(
 		JSONLog(os.Stderr),
 		Route{
-			Path:   "/plaintext",
+			Path:   "/plaintext/{name}",
 			Method: "GET",
 			Handler: func(r Request) Response {
-				return Ok(String("Hello, world!"))
+				return Ok(String("Hello, " + r.Vars["name"] + "!"))
 			},
 		},
 		Route{
-			Path:   "/json",
+			Path:   "/json/{name}",
 			Method: "GET",
 			Handler: func(r Request) Response {
 				return Ok(JSON(struct {
 					Greeting string `json:"greeting"`
-				}{Greeting: "Hello, world!"}))
+				}{Greeting: "Hello, " + r.Vars["name"] + "!"}))
+			},
+		},
+		Route{
+			Path:   "/html/{name}",
+			Method: "GET",
+			Handler: func(r Request) Response {
+				return Ok(HTMLTemplate(
+					html.Must(html.New("greeting.html").Parse(
+						`<html>
+							<body>
+								<h1>Hello, {{.Name}}</h1>
+							</body>
+						</html>`,
+					)),
+					struct{ Name string }{r.Vars["name"]}))
 			},
 		},
 		Route{
