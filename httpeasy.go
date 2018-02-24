@@ -81,8 +81,13 @@ import (
 
 // Request represents a simplified HTTP request
 type Request struct {
-	Vars    map[string]string
-	Body    io.Reader
+	// Vars are the variables parsed out of the URL path.
+	Vars map[string]string
+
+	// Body is the contents of the HTTP request body.
+	Body io.Reader
+
+	// Headers are the HTTP headers
 	Headers http.Header
 }
 
