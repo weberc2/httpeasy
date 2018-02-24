@@ -14,7 +14,7 @@
 //
 //     func main() {
 //         log.Println("Listening at :8080")
-//         if err := http.ListenAndServe(":8080", NewRouter().Register(
+//         if err := http.ListenAndServe(":8080", Register(
 //             JSONLog(os.Stderr),
 //             Route{
 //                 Path:   "/plaintext",
@@ -66,19 +66,29 @@ type Request struct {
 	Headers http.Header
 }
 
-// Text reads `r.Body` and returns the result as a string.
+// Text consumes the request body and returns it as a string.
 func (r Request) Text() (string, error) {
 	data, err := r.Bytes()
 	return string(data), err
 }
 
-// Bytes reads `r.Body` and returns the result as a slice of bytes.
+// Bytes consumes the request body and returns it as a byte slice.
 func (r Request) Bytes() ([]byte, error) {
 	return ioutil.ReadAll(r.Body)
 }
 
-// JSON deserializes `r.Body` into `v`. `v` must be a pointer; all the standard
-// `encoding/json.Unmarshal()` rules apply.
+// JSON deserializes the request body into `v`. `v` must be a pointer; all the
+// standard `encoding/json.Unmarshal()` rules apply.
+//
+//     var person struct {
+//         Name string `json:"name"`
+//         Age  int    `json:"age"`
+//     }
+//     if err := r.JSON(&person); err != nil {
+//         return err
+//     }
+//     fmt.Printf("Name='%s'; Age=%d", person.Name, person.Age)
+//
 func (r Request) JSON(v interface{}) error {
 	data, err := r.Bytes()
 	if err != nil {
@@ -130,8 +140,8 @@ func BadRequest(logging ...interface{}) Response {
 	}
 }
 
-// RequestLog represents a standard HTTP request log
-type RequestLog struct {
+// requestLog represents a standard HTTP request log
+type requestLog struct {
 	// Started holds the start time for the request
 	Started time.Time `json:"started"`
 
@@ -216,7 +226,7 @@ func (h Handler) HTTP(log LogFunc) http.HandlerFunc {
 		w.WriteHeader(rsp.Status)
 		_, err = writerTo.WriteTo(w)
 
-		log(RequestLog{
+		log(requestLog{
 			Started:    start,
 			Duration:   time.Since(start),
 			Method:     r.Method,
@@ -254,8 +264,8 @@ func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	r.inner.ServeHTTP(w, req)
 }
 
-// Register registers routes with the provided Router and returns the same
-// modified Router.
+// Register registers routes with the provided Router and LogFunc and returns
+// the same modified Router.
 func (r *Router) Register(log LogFunc, routes ...Route) *Router {
 	for _, route := range routes {
 		r.inner.Path(route.Path).
@@ -263,4 +273,13 @@ func (r *Router) Register(log LogFunc, routes ...Route) *Router {
 			HandlerFunc(route.Handler.HTTP(log))
 	}
 	return r
+}
+
+// Register creates a new router and uses it to register all of the provided
+// routes before returning it. It's purely a convenience wrapper around
+//
+//     r := NewRouter()
+//     r.Register(log, routes...)
+func Register(log LogFunc, routes ...Route) *Router {
+	return NewRouter().Register(log, routes...)
 }

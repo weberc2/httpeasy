@@ -29,7 +29,7 @@ import (
 
 func main() {
 	log.Println("Listening at :8080")
-	if err := http.ListenAndServe(":8080", NewRouter().Register(
+	if err := http.ListenAndServe(":8080", Register(
 		JSONLog(os.Stderr),
 		Route{
 			Path:   "/plaintext",
