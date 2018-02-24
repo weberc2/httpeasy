@@ -150,17 +150,23 @@ func InternalServerError(logging ...interface{}) Response {
 }
 
 // NotFound is a convenience function for building HTTP 404 Not Found
-// responses.
+// responses. If data is nil, a default serializer will be used.
 func NotFound(data Serializer, logging ...interface{}) Response {
+	if data == nil {
+		data = String("404 Not Found")
+	}
 	return Response{Status: http.StatusNotFound, Data: data, Logging: logging}
 }
 
 // BadRequest is a convenience function for building HTTP 400 Bad Request
-// responses.
-func BadRequest(logging ...interface{}) Response {
+// responses. If data is nil, a default serializer will be used.
+func BadRequest(data Serializer, logging ...interface{}) Response {
+	if data == nil {
+		data = String("400 Bad Request")
+	}
 	return Response{
 		Status:  http.StatusBadRequest,
-		Data:    String("400 Bad Request"),
+		Data:    data,
 		Logging: logging,
 	}
 }
