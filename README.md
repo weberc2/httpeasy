@@ -3,6 +3,7 @@ httpeasy
 
 [![GoDoc](https://godoc.org/github.com/weberc2/httpeasy?status.svg)](https://godoc.org/github.com/weberc2/httpeasy)
 [![Go Report Card](https://goreportcard.com/badge/github.com/weberc2/httpeasy)](https://goreportcard.com/report/github.com/weberc2/httpeasy)
+[![Coverage Status](https://coveralls.io/repos/github/weberc2/httpeasy/badge.svg?branch=master)](https://coveralls.io/github/weberc2/httpeasy?branch=master)
 
 `httpeasy` is an easy-peasy HTTP framework for Go. It's designed to be quite a
 bit easier to use than the standard library's `net/http` framework without
