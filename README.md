@@ -38,6 +38,10 @@ of utilities for working with requests...
 
 ## Usage
 
+You can run the following program yourself. Run the server with
+`go run ./examples/hello.go` and then, from another terminal, `curl
+localhost:8080/(html|plaintext|json)/{name}`.
+
 ```go
 package main
 

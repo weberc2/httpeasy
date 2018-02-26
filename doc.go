@@ -4,7 +4,9 @@
 // serializers (json, string, html template, etc) for rendering data as well as
 // convenient functions for working with requests and responses.
 //
-// Example:
+// You can run the following example program yourself. Run the server with
+// `go run ./examples/hello.go` and then, from another terminal, `curl
+// localhost:8080/(html|plaintext|json)/{name}`:
 //
 //     package main
 //
