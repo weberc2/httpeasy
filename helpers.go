@@ -22,12 +22,15 @@ func NoContent(logging ...interface{}) Response {
 	}
 }
 
-// InternalServerError is a convenience function for building HTTP 500 Internal
-// Server Error responses.
-func InternalServerError(logging ...interface{}) Response {
+// BadRequest is a convenience function for building HTTP 400 Bad Request
+// responses. If data is nil, a default serializer will be used.
+func BadRequest(data Serializer, logging ...interface{}) Response {
+	if data == nil {
+		data = String("400 Bad Request")
+	}
 	return Response{
-		Status:  http.StatusInternalServerError,
-		Data:    String("500 Internal Server Error"),
+		Status:  http.StatusBadRequest,
+		Data:    data,
 		Logging: logging,
 	}
 }
@@ -41,15 +44,12 @@ func NotFound(data Serializer, logging ...interface{}) Response {
 	return Response{Status: http.StatusNotFound, Data: data, Logging: logging}
 }
 
-// BadRequest is a convenience function for building HTTP 400 Bad Request
-// responses. If data is nil, a default serializer will be used.
-func BadRequest(data Serializer, logging ...interface{}) Response {
-	if data == nil {
-		data = String("400 Bad Request")
-	}
+// InternalServerError is a convenience function for building HTTP 500 Internal
+// Server Error responses.
+func InternalServerError(logging ...interface{}) Response {
 	return Response{
-		Status:  http.StatusBadRequest,
-		Data:    data,
+		Status:  http.StatusInternalServerError,
+		Data:    String("500 Internal Server Error"),
 		Logging: logging,
 	}
 }
