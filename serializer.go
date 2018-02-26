@@ -30,15 +30,13 @@ type Serializer func() (io.WriterTo, error)
 
 // String wraps a string in a serializer.
 func String(s string) Serializer {
-	writerTo := strings.NewReader(s)
-	return func() (io.WriterTo, error) { return writerTo, nil }
+	return func() (io.WriterTo, error) { return strings.NewReader(s), nil }
 }
 
 // Bytes wraps a byte slice in a serializer. The returned serializer always
 // succeeds.
 func Bytes(bs []byte) Serializer {
-	writerTo := bytes.NewReader(bs)
-	return func() (io.WriterTo, error) { return writerTo, nil }
+	return func() (io.WriterTo, error) { return bytes.NewReader(bs), nil }
 }
 
 // Sprint wraps N values in a serializer. Its serialization mechanism is
