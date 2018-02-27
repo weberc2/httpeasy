@@ -22,6 +22,20 @@ func NoContent(logging ...interface{}) Response {
 	}
 }
 
+// TemporaryRedirect is a convenience function for building HTTP 307 Temporary
+// Redirect responses. It takes no data argument because there isn't much point
+// in custom status text for a redirect response. Instead, it takes a URL that
+// will be used as the Location header, which should be used by clients as the
+// redirect location.
+func TemporaryRedirect(location string, logging ...interface{}) Response {
+	return Response{
+		Status:  http.StatusTemporaryRedirect,
+		Data:    String("307 Temporary Redirect"),
+		Logging: logging,
+		Headers: http.Header{"Location": []string{location}},
+	}
+}
+
 // BadRequest is a convenience function for building HTTP 400 Bad Request
 // responses. If data is nil, a default serializer will be used.
 func BadRequest(data Serializer, logging ...interface{}) Response {
@@ -30,6 +44,19 @@ func BadRequest(data Serializer, logging ...interface{}) Response {
 	}
 	return Response{
 		Status:  http.StatusBadRequest,
+		Data:    data,
+		Logging: logging,
+	}
+}
+
+// Unauthorized is a convenience function for building HTTP 401 Unauthorized
+// responses. If data is nil, a default serializer will be used.
+func Unauthorized(data Serializer, logging ...interface{}) Response {
+	if data == nil {
+		data = String("401 Unauthorized")
+	}
+	return Response{
+		Status:  http.StatusUnauthorized,
 		Data:    data,
 		Logging: logging,
 	}

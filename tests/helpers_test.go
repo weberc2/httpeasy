@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"net/http"
+	"strings"
 	"testing"
 
 	. "github.com/weberc2/httpeasy"
@@ -63,6 +65,24 @@ func TestHelpers(t *testing.T) {
 			Logging: []interface{}{"foo", 1, "bar", 2},
 		},
 	}, {
+		Name:   "temporary-redirect",
+		Actual: TemporaryRedirect("http://google.com"),
+		Wanted: Response{
+			Status:  307,
+			Data:    String("307 Temporary Redirect"),
+			Logging: nil,
+			Headers: http.Header{"Location": []string{"http://google.com"}},
+		},
+	}, {
+		Name:   "temporary-redirect-with-logging",
+		Actual: TemporaryRedirect("http://yahoo.com", "logs", "go", "here"),
+		Wanted: Response{
+			Status:  307,
+			Data:    String("307 Temporary Redirect"),
+			Logging: []interface{}{"logs", "go", "here"},
+			Headers: http.Header{"Location": []string{"http://yahoo.com"}},
+		},
+	}, {
 		Name:   "bad-request",
 		Actual: BadRequest(String("400 BAD REQUEST")),
 		Wanted: Response{
@@ -85,6 +105,30 @@ func TestHelpers(t *testing.T) {
 			Status:  400,
 			Data:    String("400 Bad Request"),
 			Logging: []interface{}{"x", "y", "z"},
+		},
+	}, {
+		Name:   "unauthorized",
+		Actual: Unauthorized(String("401 UNAUTHORIZED")),
+		Wanted: Response{
+			Status:  401,
+			Data:    String("401 UNAUTHORIZED"),
+			Logging: nil,
+		},
+	}, {
+		Name:   "unauthorized-nil-data",
+		Actual: Unauthorized(nil),
+		Wanted: Response{
+			Status:  401,
+			Data:    String("401 Unauthorized"),
+			Logging: nil,
+		},
+	}, {
+		Name:   "unauthorized-with-logging",
+		Actual: Unauthorized(nil, "some", "logs", "here"),
+		Wanted: Response{
+			Status:  401,
+			Data:    String("401 Unauthorized"),
+			Logging: []interface{}{"some", "logs", "here"},
 		},
 	}, {
 		Name:   "not-found",
@@ -149,6 +193,10 @@ func compareResponses(wanted, actual Response) error {
 		)
 	}
 
+	if err := compareHeaders(wanted.Headers, actual.Headers); err != nil {
+		return err
+	}
+
 	// NOTE: Validating by marshaling to JSON and comparing the resulting
 	// bytes. This is probably fragile, so we'll need to find something better
 	// going forward.
@@ -176,6 +224,49 @@ func compareResponses(wanted, actual Response) error {
 	}
 
 	return compareSerializers(wanted.Data, actual.Data)
+}
+
+func compareHeaders(wanted, actual http.Header) error {
+	if len(wanted) != len(actual) {
+		return fmt.Errorf(
+			"Wanted headers:\n%s\n\nGot headers:\n%s",
+			stringHeaders(wanted),
+			stringHeaders(actual),
+		)
+	}
+	for header, values := range wanted {
+		if otherValues, found := actual[header]; found {
+			if len(values) != len(otherValues) {
+				return fmt.Errorf(
+					"Wanted values for header '%s': [%s], got [%s]",
+					header,
+					strings.Join(values, ", "),
+					strings.Join(otherValues, ", "),
+				)
+			}
+			for i, value := range values {
+				if value != otherValues[i] {
+					return fmt.Errorf(
+						"Wanted values for header '%s': [%s], got [%s]",
+						header,
+						strings.Join(values, ", "),
+						strings.Join(otherValues, ", "),
+					)
+				}
+			}
+		} else {
+			return fmt.Errorf("Missing header '%s'", header)
+		}
+	}
+	return nil
+}
+
+func stringHeaders(headers http.Header) string {
+	var buf bytes.Buffer
+	for header, values := range headers {
+		fmt.Fprintf(&buf, "%s: %s\n", header, strings.Join(values, ", "))
+	}
+	return buf.String()
 }
 
 func compareSerializers(wanted, actual Serializer) error {
