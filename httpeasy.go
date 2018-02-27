@@ -67,6 +67,9 @@ type Response struct {
 
 	// Logging is the information to pass to the logger
 	Logging []interface{}
+
+	// Headers is the HTTP headers for the response
+	Headers http.Header
 }
 
 // requestLog represents a standard HTTP request log
