@@ -87,6 +87,30 @@ func TestHelpers(t *testing.T) {
 			Logging: []interface{}{"x", "y", "z"},
 		},
 	}, {
+		Name:   "unauthorized",
+		Actual: Unauthorized(String("401 UNAUTHORIZED")),
+		Wanted: Response{
+			Status:  401,
+			Data:    String("401 UNAUTHORIZED"),
+			Logging: nil,
+		},
+	}, {
+		Name:   "unauthorized-nil-data",
+		Actual: Unauthorized(nil),
+		Wanted: Response{
+			Status:  401,
+			Data:    String("401 Unauthorized"),
+			Logging: nil,
+		},
+	}, {
+		Name:   "unauthorized-with-logging",
+		Actual: Unauthorized(nil, "some", "logs", "here"),
+		Wanted: Response{
+			Status:  401,
+			Data:    String("401 Unauthorized"),
+			Logging: []interface{}{"some", "logs", "here"},
+		},
+	}, {
 		Name:   "not-found",
 		Actual: NotFound(String("404 NOT FOUND")),
 		Wanted: Response{

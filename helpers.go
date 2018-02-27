@@ -35,6 +35,19 @@ func BadRequest(data Serializer, logging ...interface{}) Response {
 	}
 }
 
+// Unauthorized is a convenience function for building HTTP 401 Unauthorized
+// responses. If data is nil, a default serializer will be used.
+func Unauthorized(data Serializer, logging ...interface{}) Response {
+	if data == nil {
+		data = String("401 Unauthorized")
+	}
+	return Response{
+		Status:  http.StatusUnauthorized,
+		Data:    data,
+		Logging: logging,
+	}
+}
+
 // NotFound is a convenience function for building HTTP 404 Not Found
 // responses. If data is nil, a default serializer will be used.
 func NotFound(data Serializer, logging ...interface{}) Response {
