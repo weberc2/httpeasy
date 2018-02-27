@@ -37,6 +37,10 @@ of utilities for working with requests...
 
 `go get -u github.com/weberc2/httpeasy`
 
+## Testing
+
+Just like any Go project, `go test ./...` (from the project root directory)
+
 ## Usage
 
 You can run the following program yourself. Run the server with
