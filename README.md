@@ -116,3 +116,5 @@ func main() {
 * CRUD boilerplate (not even sure if there is a way to solve this that is
   strictly better than just leaving the boilerplate--i.e., boilerplate is often
   better than magic)
+* A daemon that writes JSONLog output to a SQL database for analysis
+    - How to handle custom fields?
