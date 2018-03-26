@@ -5,10 +5,9 @@ httpeasy
 [![Go Report Card](https://goreportcard.com/badge/github.com/weberc2/httpeasy)](https://goreportcard.com/report/github.com/weberc2/httpeasy)
 [![Coverage Status](https://coveralls.io/repos/github/weberc2/httpeasy/badge.svg?branch=master)](https://coveralls.io/github/weberc2/httpeasy?branch=master)
 
-`httpeasy` is an easy-peasy HTTP framework for Go. It's designed to be quite a
-bit easier to use than the standard library's `net/http` framework without
-compromising performance. It is deliberately less fully-featured than
-`net/http`.
+`httpeasy` is an easy-peasy HTTP library for Go. It aims to jump start your
+web development projects and generally be simpler, easier, and more ergonomic
+than `net/http` and other libraries.
 
 `httpeasy` provides complete request logging out of the box as well as a suite
 of helper functions for operating on requests and responses, including a suite
@@ -106,3 +105,14 @@ func main() {
 	}
 }
 ```
+
+# TODO (webdev things that could be improved for Go)
+
+* GZip
+* HTTPS
+* Auth (separate library)
+* SQL query building (separate library)
+* SQL migrations (separate library)
+* CRUD boilerplate (not even sure if there is a way to solve this that is
+  strictly better than just leaving the boilerplate--i.e., boilerplate is often
+  better than magic)
