@@ -49,6 +49,14 @@ func TestHelpers(t *testing.T) {
 			Logging: []interface{}{"some", "logging"},
 		},
 	}, {
+		Name:   "created-nil-data",
+		Actual: Created(nil),
+		Wanted: Response{
+			Status:  201,
+			Data:    String("201 Created"),
+			Logging: nil,
+		},
+	}, {
 		Name:   "no-content",
 		Actual: NoContent(),
 		Wanted: Response{

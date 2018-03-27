@@ -9,6 +9,9 @@ func Ok(data Serializer, logging ...interface{}) Response {
 
 // Created is a convenience function for building HTTP 201 responses.
 func Created(data Serializer, logging ...interface{}) Response {
+	if data == nil {
+		data = String("201 Created")
+	}
 	return Response{Status: http.StatusCreated, Data: data, Logging: logging}
 }
 
