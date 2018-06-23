@@ -57,7 +57,7 @@ func (r Request) JSON(v interface{}) error {
 	return json.Unmarshal(data, v)
 }
 
-// Response represents a simplifiied HTTP response
+// Response represents a simplified HTTP response
 type Response struct {
 	// Status is the HTTP status code to write
 	Status int
