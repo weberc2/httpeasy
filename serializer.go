@@ -33,10 +33,28 @@ func String(s string) Serializer {
 	return func() (io.WriterTo, error) { return strings.NewReader(s), nil }
 }
 
+func Stringf(format string, vs ...interface{}) Serializer {
+	return String(fmt.Sprintf(format, vs...))
+}
+
 // Bytes wraps a byte slice in a serializer. The returned serializer always
 // succeeds.
 func Bytes(bs []byte) Serializer {
 	return func() (io.WriterTo, error) { return bytes.NewReader(bs), nil }
+}
+
+type reader struct {
+	r io.Reader
+}
+
+func (r reader) WriteTo(w io.Writer) (int64, error) {
+	return io.CopyBuffer(w, r.r, make([]byte, 4096))
+}
+
+// Reader wraps an `io.Reader` in a serializer. The returned serializer always
+// succeeds.
+func Reader(r io.Reader) Serializer {
+	return func() (io.WriterTo, error) { return reader{r}, nil }
 }
 
 // Sprint wraps N values in a serializer. Its serialization mechanism is
