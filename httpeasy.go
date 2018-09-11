@@ -2,6 +2,7 @@ package httpeasy
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
@@ -37,8 +38,20 @@ func (r Request) Bytes() ([]byte, error) {
 	return ioutil.ReadAll(r.Body)
 }
 
+// InvalidJSONErr wraps an error encountered while trying to unmarshal JSON.
+type InvalidJSONErr struct {
+	Err error
+}
+
+// Error implements the error interface for InvalidJSONErr
+func (err InvalidJSONErr) Error() string {
+	return fmt.Sprintf("Invalid JSON: %v", err.Err)
+}
+
 // JSON deserializes the request body into `v`. `v` must be a pointer; all the
-// standard `encoding/json.Unmarshal()` rules apply.
+// standard `encoding/json.Unmarshal()` rules apply. If an error is encountered
+// while unmarshaling, `InvalidJSONErr` is returned to distinguish it from
+// errors encountered while reading the request body.
 //
 //     var person struct {
 //         Name string `json:"name"`
@@ -54,7 +67,10 @@ func (r Request) JSON(v interface{}) error {
 	if err != nil {
 		return err
 	}
-	return json.Unmarshal(data, v)
+	if err := json.Unmarshal(data, v); err != nil {
+		return InvalidJSONErr{err}
+	}
+	return nil
 }
 
 // Response represents a simplified HTTP response
