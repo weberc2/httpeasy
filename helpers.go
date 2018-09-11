@@ -7,7 +7,8 @@ func Ok(data Serializer, logging ...interface{}) Response {
 	return Response{Status: http.StatusOK, Data: data, Logging: logging}
 }
 
-// Created is a convenience function for building HTTP 201 responses.
+// Created is a convenience function for building HTTP 201 responses. If data
+// is nil, a default serializer will be used.
 func Created(data Serializer, logging ...interface{}) Response {
 	if data == nil {
 		data = String("201 Created")
