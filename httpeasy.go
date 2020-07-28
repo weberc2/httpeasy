@@ -174,6 +174,17 @@ func (h Handler) HTTP(log LogFunc) http.HandlerFunc {
 				},
 			}
 		}
+
+		// Copy HTTP headers from the response object to the response writer.
+		// This has to go before the WriteHeader invocation or it won't take
+		// effect (quirk of net/http.ResponseWriter).
+		header := w.Header()
+		for key, values := range rsp.Headers {
+			for _, value := range values {
+				header.Add(key, value)
+			}
+		}
+
 		w.WriteHeader(rsp.Status)
 		_, err = writerTo.WriteTo(w)
 
