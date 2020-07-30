@@ -25,6 +25,14 @@ func TestHelpers(t *testing.T) {
 			Logging: nil,
 		},
 	}, {
+		Name:   "ok-nil-data",
+		Actual: Ok(nil),
+		Wanted: Response{
+			Status:  200,
+			Data:    String("200 OK"),
+			Logging: nil,
+		},
+	}, {
 		Name:   "ok-with-logging",
 		Actual: Ok(String("200 OK"), "foo", 1, nil),
 		Wanted: Response{

@@ -4,6 +4,9 @@ import "net/http"
 
 // Ok is a convenience function for building HTTP 200 OK responses.
 func Ok(data Serializer, logging ...interface{}) Response {
+	if data == nil {
+		data = String("200 OK")
+	}
 	return Response{Status: http.StatusOK, Data: data, Logging: logging}
 }
 
