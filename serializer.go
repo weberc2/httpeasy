@@ -33,6 +33,8 @@ func String(s string) Serializer {
 	return func() (io.WriterTo, error) { return strings.NewReader(s), nil }
 }
 
+// Stringf formats a string and wraps it in a serializer. Conceptually, it's
+// `String(fmt.Sprintf(format, vs...)))`.
 func Stringf(format string, vs ...interface{}) Serializer {
 	return String(fmt.Sprintf(format, vs...))
 }

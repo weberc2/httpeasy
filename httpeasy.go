@@ -214,6 +214,21 @@ type Route struct {
 	Handler Handler
 }
 
+// StdlibRoute holds the complete routing information. It is the same as a
+// `Route` except that the handler type is an `http.HandlerFunc` instead of a
+// `Handler`.
+type StdlibRoute struct {
+	// Method is the HTTP method for the route
+	Method string
+
+	// Path is the path to the handler. See github.com/gorilla/mux.Route.Path
+	// for additional details.
+	Path string
+
+	// Handler is the function which handles the request
+	Handler http.HandlerFunc
+}
+
 // Router is an HTTP mux for httpeasy.
 type Router struct {
 	inner *mux.Router
@@ -234,6 +249,17 @@ func (r *Router) Register(log LogFunc, routes ...Route) *Router {
 		r.inner.Path(route.Path).
 			Methods(route.Method).
 			HandlerFunc(route.Handler.HTTP(log))
+	}
+	return r
+}
+
+// RegisterStdlib registers `StdlibRoute`s with the provided Router and returns
+// the same modified Router.
+func (r *Router) RegisterStdlib(routes ...StdlibRoute) *Router {
+	for _, route := range routes {
+		r.inner.Path(route.Path).
+			Methods(route.Method).
+			HandlerFunc(route.Handler)
 	}
 	return r
 }
