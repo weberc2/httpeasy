@@ -29,6 +29,18 @@ func NoContent(logging ...interface{}) Response {
 	}
 }
 
+// Conflict is a convenience function for building HTTP 209 Conflict responses.
+func Conflict(data Serializer, logging ...interface{}) Response {
+	if data == nil {
+		data = String("409 Conflict")
+	}
+	return Response{
+		Status:  http.StatusConflict,
+		Data:    data,
+		Logging: logging,
+	}
+}
+
 // TemporaryRedirect is a convenience function for building HTTP 307 Temporary
 // Redirect responses. It takes no data argument because there isn't much point
 // in custom status text for a redirect response. Instead, it takes a URL that
