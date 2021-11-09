@@ -25,6 +25,10 @@ type Request struct {
 
 	// Headers are the HTTP headers
 	Headers http.Header
+
+	// URL contains the parsed URL information. See net/http.Request.URL for
+	// more information.
+	URL *url.URL
 }
 
 // Text consumes the request body and returns it as a string.
@@ -119,7 +123,7 @@ type requestLog struct {
 // JSONLog returns a `LogFunc` which logs JSON to `w`.
 func JSONLog(w io.Writer) LogFunc {
 	return func(v interface{}) {
-		data, err := json.MarshalIndent(v, "", "    ")
+		data, err := json.Marshal(v)
 		if err != nil {
 			data, err = json.Marshal(struct {
 				Context   string `json:"context"`
@@ -156,7 +160,12 @@ func (h Handler) HTTP(log LogFunc) http.HandlerFunc {
 		start := time.Now()
 		defer r.Body.Close()
 
-		rsp := h(Request{Vars: mux.Vars(r), Body: r.Body, Headers: r.Header})
+		rsp := h(Request{
+			Vars:    mux.Vars(r),
+			Body:    r.Body,
+			Headers: r.Header,
+			URL:     r.URL,
+		})
 
 		writerTo, err := rsp.Data()
 		if err != nil {
