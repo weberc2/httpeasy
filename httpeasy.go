@@ -140,7 +140,7 @@ func JSONLog(w io.Writer) LogFunc {
 				return
 			}
 		}
-		if _, err := w.Write(data); err != nil {
+		if _, err := fmt.Fprintf(w, "%s\n", data); err != nil {
 			log.Println("ERROR WRITING TO LOGGER:", err)
 		}
 	}
