@@ -90,6 +90,9 @@ type Response struct {
 
 	// Headers is the HTTP headers for the response
 	Headers http.Header
+
+	// Cookies are the list of cookies to be set on the response
+	Cookies []*http.Cookie
 }
 
 // requestLog represents a standard HTTP request log
@@ -192,6 +195,10 @@ func (h Handler) HTTP(log LogFunc) http.HandlerFunc {
 			for _, value := range values {
 				header.Add(key, value)
 			}
+		}
+
+		for _, cookie := range rsp.Cookies {
+			http.SetCookie(w, cookie)
 		}
 
 		w.WriteHeader(rsp.Status)
