@@ -95,6 +95,20 @@ type Response struct {
 	Cookies []*http.Cookie
 }
 
+// WithHeaders returns a copy of the response with the specified headers
+// attached.
+func (r Response) WithHeaders(headers http.Header) Response {
+	r.Headers = headers
+	return r
+}
+
+// WithCookies returns a copy of the response with the specified cookies
+// attached.
+func (r Response) WithCookies(cookies ...*http.Cookie) Response {
+	r.Cookies = cookies
+	return r
+}
+
 // requestLog represents a standard HTTP request log
 type requestLog struct {
 	// Started holds the start time for the request
