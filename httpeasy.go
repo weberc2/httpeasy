@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"net/url"
+	"strconv"
 	"strings"
 	"time"
 
@@ -177,12 +178,28 @@ func (h Handler) HTTP(log LogFunc) http.HandlerFunc {
 		start := time.Now()
 		defer r.Body.Close()
 
-		rsp := h(Request{
-			Vars:    mux.Vars(r),
-			Body:    r.Body,
-			Headers: r.Header,
-			URL:     r.URL,
-		})
+		var rsp Response
+		contentLength := r.Header.Get("Content-Length")
+		i, err := strconv.ParseInt(contentLength, 10, 64)
+		if err != nil {
+			rsp = BadRequest(
+				String("400 Invalid `Content-Length` header"),
+				struct {
+					Context string `json:"context"`
+					Error   string `json:"error"`
+				}{
+					Context: "Invalid `Content-Length` header",
+					Error:   err.Error(),
+				},
+			)
+		} else {
+			rsp = h(Request{
+				Vars:    mux.Vars(r),
+				Body:    io.LimitReader(r.Body, i),
+				Headers: r.Header,
+				URL:     r.URL,
+			})
+		}
 
 		writerTo, err := rsp.Data()
 		if err != nil {
