@@ -41,11 +41,27 @@ func Conflict(data Serializer, logging ...interface{}) Response {
 	}
 }
 
+// SeeOther is a convenience function for building HTTP 303 Temporary
+// Redirect responses. It takes no data argument because there isn't much point
+// in custom status text for a redirect response. Instead, it takes a URL that
+// will be used as the Location header, which should be used by clients as the
+// redirect location. When deciding between HTTP 302, 303, and 307, consult
+// https://developer.mozilla.org/en-US/docs/Web/HTTP/Redirections#temporary_redirections.
+func SeeOther(location string, logging ...interface{}) Response {
+	return Response{
+		Status:  http.StatusSeeOther,
+		Data:    String("303 See Other"),
+		Logging: logging,
+		Headers: http.Header{"Location": []string{location}},
+	}
+}
+
 // TemporaryRedirect is a convenience function for building HTTP 307 Temporary
 // Redirect responses. It takes no data argument because there isn't much point
 // in custom status text for a redirect response. Instead, it takes a URL that
 // will be used as the Location header, which should be used by clients as the
-// redirect location.
+// redirect location. When deciding between HTTP 302, 303, and 307, consult
+// https://developer.mozilla.org/en-US/docs/Web/HTTP/Redirections#temporary_redirections.
 func TemporaryRedirect(location string, logging ...interface{}) Response {
 	return Response{
 		Status:  http.StatusTemporaryRedirect,
