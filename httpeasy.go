@@ -182,24 +182,25 @@ func (h Handler) HTTP(log LogFunc) http.HandlerFunc {
 		contentLength := r.Header.Get("Content-Length")
 		i, err := strconv.ParseInt(contentLength, 10, 64)
 		if err != nil {
-			rsp = BadRequest(
-				String("400 Invalid `Content-Length` header"),
+			i = 0 // just being explicit
+			rsp.Logging = append(
+				rsp.Logging,
 				struct {
 					Context string `json:"context"`
 					Error   string `json:"error"`
 				}{
-					Context: "Invalid `Content-Length` header",
-					Error:   err.Error(),
+					Context: "Invalid or missing `Content-Length` header; " +
+						"defaulting to Content-Length=0",
+					Error: err.Error(),
 				},
 			)
-		} else {
-			rsp = h(Request{
-				Vars:    mux.Vars(r),
-				Body:    io.LimitReader(r.Body, i),
-				Headers: r.Header,
-				URL:     r.URL,
-			})
 		}
+		rsp = h(Request{
+			Vars:    mux.Vars(r),
+			Body:    io.LimitReader(r.Body, i),
+			Headers: r.Header,
+			URL:     r.URL,
+		})
 
 		writerTo, err := rsp.Data()
 		if err != nil {
