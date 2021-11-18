@@ -97,16 +97,28 @@ type Response struct {
 }
 
 // WithHeaders returns a copy of the response with the specified headers
-// attached.
+// attached. The headers provided by this method will be merged with any
+// existing headers on the response.
 func (r Response) WithHeaders(headers http.Header) Response {
-	r.Headers = headers
+	for key, values := range headers {
+		r.Headers[key] = append(r.Headers[key], values...)
+	}
 	return r
 }
 
 // WithCookies returns a copy of the response with the specified cookies
-// attached.
+// attached. The cookies provided by this method will be appended onto any
+// existing cookies on the response.
 func (r Response) WithCookies(cookies ...*http.Cookie) Response {
-	r.Cookies = cookies
+	r.Cookies = append(r.Cookies, cookies...)
+	return r
+}
+
+// WithLogging returns a copy of the response with the specified logging
+// attached. The logging provided by this method will be appended onto any
+// existing cookies on the response.
+func (r Response) WithLogging(logging ...interface{}) Response {
+	r.Logging = append(r.Logging, logging...)
 	return r
 }
 
