@@ -43,6 +43,21 @@ func (r Request) Bytes() ([]byte, error) {
 	return ioutil.ReadAll(r.Body)
 }
 
+// Cookie returns the named cookie if it exists, otherwise http.ErrNoCookie.
+func (r Request) Cookie(name string) (*http.Cookie, error) {
+	for _, c := range readCookies(r.Headers, name) {
+		if c.Name == name {
+			return c, nil
+		}
+	}
+	return nil, http.ErrNoCookie
+}
+
+// Cookies returns the cookies attached to the request.
+func (r Request) Cookies() []*http.Cookie {
+	return readCookies(r.Headers, "")
+}
+
 // InvalidJSONErr wraps an error encountered while trying to unmarshal JSON.
 type InvalidJSONErr struct {
 	Err error
