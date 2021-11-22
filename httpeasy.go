@@ -115,6 +115,9 @@ type Response struct {
 // attached. The headers provided by this method will be merged with any
 // existing headers on the response.
 func (r Response) WithHeaders(headers http.Header) Response {
+	if r.Headers == nil {
+		r.Headers = http.Header{}
+	}
 	for key, values := range headers {
 		r.Headers[key] = append(r.Headers[key], values...)
 	}
