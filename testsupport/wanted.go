@@ -39,3 +39,7 @@ func (wanted WantedSerializer) CompareSerializer(
 
 	return wanted.CompareData(data)
 }
+
+func CompareSerializer(wanted WantedData, found httpeasy.Serializer) error {
+	return WantedSerializer{wanted}.CompareSerializer(found)
+}
