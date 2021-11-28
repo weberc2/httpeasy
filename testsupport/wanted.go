@@ -29,6 +29,13 @@ type WantedSerializer struct {
 	WantedData
 }
 
+type CompareSerializerError struct {
+	Data []byte
+	Err  error
+}
+
+func (err *CompareSerializerError) Error() string { return err.Err.Error() }
+
 func (wanted WantedSerializer) CompareSerializer(
 	found httpeasy.Serializer,
 ) error {
@@ -37,7 +44,11 @@ func (wanted WantedSerializer) CompareSerializer(
 		return err
 	}
 
-	return wanted.CompareData(data)
+	if err := wanted.CompareData(data); err != nil {
+		return &CompareSerializerError{data, err}
+	}
+
+	return nil
 }
 
 func CompareSerializer(wanted WantedData, found httpeasy.Serializer) error {
