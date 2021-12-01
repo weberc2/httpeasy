@@ -154,8 +154,11 @@ type requestLog struct {
 	// URL holds the URL for the request
 	URL url.URL `json:"url"`
 
-	// Headers holds the headers for the request
-	Headers http.Header `json:"headers"`
+	// RequestHeaders holds the headers for the request
+	RequestHeaders http.Header `json:"requestHeaders"`
+
+	// ResponseHeaders holds the headers for the request
+	ResponseHeaders http.Header `json:"responseHeaders"`
 
 	// Status holds the HTTP status code returned by the request handler
 	Status int `json:"status"`
@@ -165,7 +168,7 @@ type requestLog struct {
 
 	// WriteError holds any errors that were encountered during writing the
 	// response to the output socket.
-	WriteError interface{} `json:"write_error"`
+	WriteError interface{} `json:"writeError"`
 }
 
 // JSONLog returns a `LogFunc` which logs JSON to `w`.
@@ -175,10 +178,10 @@ func JSONLog(w io.Writer) LogFunc {
 		if err != nil {
 			data, err = json.Marshal(struct {
 				Context   string `json:"context"`
-				DebugData string `json:"debug_data"`
+				DebugData string `json:"debugData"`
 				Error     string `json:"error"`
 			}{
-				Context:   "Error marshaling 'debug_data' into JSON",
+				Context:   "Error marshaling 'debugData' into JSON",
 				DebugData: spew.Sdump(v),
 				Error:     err.Error(),
 			})
@@ -240,7 +243,7 @@ func (h Handler) HTTP(log LogFunc) http.HandlerFunc {
 				struct {
 					Context         string        `json:"context"`
 					Error           string        `json:"error"`
-					OriginalLogging []interface{} `json:"original_logging"`
+					OriginalLogging []interface{} `json:"originalLogging"`
 				}{
 					Context:         "Error serializing response data",
 					Error:           err.Error(),
@@ -267,14 +270,15 @@ func (h Handler) HTTP(log LogFunc) http.HandlerFunc {
 		_, err = writerTo.WriteTo(w)
 
 		log(requestLog{
-			Started:    start,
-			Duration:   time.Since(start),
-			Method:     r.Method,
-			URL:        *r.URL,
-			Headers:    r.Header,
-			Status:     rsp.Status,
-			Message:    rsp.Logging,
-			WriteError: err,
+			Started:         start,
+			Duration:        time.Since(start),
+			Method:          r.Method,
+			URL:             *r.URL,
+			RequestHeaders:  r.Header,
+			ResponseHeaders: w.Header(),
+			Status:          rsp.Status,
+			Message:         rsp.Logging,
+			WriteError:      err,
 		})
 	}
 }
