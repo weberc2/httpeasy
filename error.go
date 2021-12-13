@@ -19,12 +19,43 @@ func (err *HTTPError) HTTPError() *HTTPError { return err }
 
 func (err *HTTPError) Error() string { return string(err.Message) }
 
-func (err *HTTPError) Compare(other error) error {
+func (err *HTTPError) Compare(other *HTTPError) error {
+	if err == other {
+		return nil
+	}
+
+	if err != nil && other == nil {
+		return fmt.Errorf("wanted not-nil; found `nil`")
+	}
+
+	if err == nil && other != nil {
+		return fmt.Errorf("wanted `nil`; found not-nil")
+	}
+
+	if err.Status != other.Status {
+		return fmt.Errorf(
+			"HTTPError.Status: wanted `%d`; found `%d`",
+			err.Status,
+			other.Status,
+		)
+	}
+
+	if err.Message != other.Message {
+		return fmt.Errorf(
+			"HTTPError.Message: wanted `%s`; found `%s`",
+			err.Message,
+			other.Message,
+		)
+	}
+	return nil
+}
+
+func (err *HTTPError) CompareErr(other error) error {
 	var e *HTTPError
 	if !errors.As(other, &e) {
 		return fmt.Errorf("wanted `%v`; found `%v`", err, other)
 	}
-	return nil
+	return err.Compare(e)
 }
 
 func (wanted *HTTPError) CompareData(data []byte) error {
