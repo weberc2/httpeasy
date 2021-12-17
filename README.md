@@ -90,7 +90,8 @@ func main() {
 							</body>
 						</html>`,
 					)),
-					struct{ Name string }{r.Vars["name"]}))
+					struct{ Name string }{r.Vars["name"]},
+                ))
 			},
 		},
 		Route{
@@ -105,16 +106,3 @@ func main() {
 	}
 }
 ```
-
-# TODO (webdev things that could be improved for Go)
-
-* GZip
-* HTTPS
-* Auth (separate library)
-* SQL query building (separate library)
-* SQL migrations (separate library)
-* CRUD boilerplate (not even sure if there is a way to solve this that is
-  strictly better than just leaving the boilerplate--i.e., boilerplate is often
-  better than magic)
-* A daemon that writes JSONLog output to a SQL database for analysis
-    - How to handle custom fields?
