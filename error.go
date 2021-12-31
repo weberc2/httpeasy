@@ -65,6 +65,7 @@ func (err *HTTPError) Compare(other *HTTPError) error {
 				found,
 			)
 		}
+		return nil
 	}
 	if err.Cause_ == nil && other.Cause_ == nil {
 		return nil
