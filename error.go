@@ -55,7 +55,27 @@ func (err *HTTPError) Compare(other *HTTPError) error {
 			other.Message,
 		)
 	}
-	return nil
+
+	if err.Cause_ != nil && other.Cause_ != nil {
+		wanted, found := err.Cause_.Error(), other.Cause_.Error()
+		if wanted != found {
+			return fmt.Errorf(
+				"HTTPError.Cause_: wanted `%s`; found `%s`",
+				wanted,
+				found,
+			)
+		}
+	}
+	if err.Cause_ == nil && other.Cause_ == nil {
+		return nil
+	}
+
+	// exactly one of the `Cause_` fields are nil
+	return fmt.Errorf(
+		"HTTPError.Cause_: wanted `%v`; found `%v`",
+		err.Cause_,
+		other.Cause_,
+	)
 }
 
 func (err *HTTPError) CompareErr(other error) error {
