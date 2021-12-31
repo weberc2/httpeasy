@@ -13,11 +13,19 @@ type Error interface {
 type HTTPError struct {
 	Status  int    `json:"status"`
 	Message string `json:"message"`
+	Cause_  error  `json:"cause,omitempty"`
 }
+
+func (err *HTTPError) Cause() error { return err.Cause_ }
 
 func (err *HTTPError) HTTPError() *HTTPError { return err }
 
-func (err *HTTPError) Error() string { return string(err.Message) }
+func (err *HTTPError) Error() string {
+	if err.Cause_ == nil {
+		return err.Message
+	}
+	return fmt.Sprintf("%s: %s", err.Message, err.Cause_)
+}
 
 func (err *HTTPError) Compare(other *HTTPError) error {
 	if err == other {
