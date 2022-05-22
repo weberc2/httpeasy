@@ -19,6 +19,14 @@ func Created(data Serializer, logging ...interface{}) Response {
 	return Response{Status: http.StatusCreated, Data: data, Logging: logging}
 }
 
+// Accepted is a convenience function for building HTTP 202 Accepted responses.
+func Accepted(data Serializer, logging ...interface{}) Response {
+	if data == nil {
+		data = String("202 Accepted")
+	}
+	return Response{Status: http.StatusAccepted, Data: data, Logging: logging}
+}
+
 // NoContent is a convenience function for building HTTP 204 No Content
 // responses.
 func NoContent(logging ...interface{}) Response {
