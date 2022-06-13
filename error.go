@@ -13,7 +13,7 @@ type Error interface {
 type HTTPError struct {
 	Status  int    `json:"status"`
 	Message string `json:"message"`
-	Cause_  error  `json:"cause,omitempty"`
+	Cause_  error  `json:"-"`
 }
 
 func (err *HTTPError) Cause() error { return err.Cause_ }
